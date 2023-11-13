@@ -31,7 +31,7 @@ def buscar():
 def recomendar():
     data = request.get_json()
     recs = recomendador(data['materias'])
-    return materiasPorIDs(recs[:min(6, len(recs))])
+    return materiasPorIDs(recs[:min(10, len(recs))])
 
 @app.route('/api/log', methods=['POST'])
 def logger():
