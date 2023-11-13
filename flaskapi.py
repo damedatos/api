@@ -1,6 +1,7 @@
 from modelo import recomendador
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import Flask, request
+from datetime import datetime
 import json, csv
 
 app = Flask(__name__)
@@ -37,9 +38,16 @@ def recomendar():
 def logger():
     try:
         data = json.loads(request.data)
+        data.insert(0, datetime.now())
         with open('analytics.csv', 'a') as csv_file:
             writer = csv.writer(csv_file)
             writer.writerow(data)
+
+        for materia in data:
+            materias[materia['id']]['score'] += 1
+        with open('materias.json', 'w') as json_file:
+            json.dump(materias, json_file, indent=1)
+
         return '200'
     except:
         return '500'
