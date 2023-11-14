@@ -11,6 +11,10 @@ app.wsgi_app = ProxyFix(
 
 with open('materias.json', 'r') as json_file:
     materias = json.load(json_file)
+for materia in materias:
+    materia['score'] = 0
+
+scoreTotal = 0
 
 def materiaPorID(id):
     for materia in materias:
@@ -36,19 +40,21 @@ def recomendar():
 
 @app.route('/api/log', methods=['POST'])
 def logger():
+    global scoreTotal
     try:
         data = json.loads(request.data)
+        for materia in data:
+            materias[materia['id']]['score'] += 1
+            scoreTotal += 1
+        if scoreTotal >= 100:
+            scoreTotal = 0
+        
         data.insert(0, datetime.now())
         with open('analytics.csv', 'a') as csv_file:
             writer = csv.writer(csv_file)
             writer.writerow(data)
-
-        for materia in data:
-            materias[materia['id']]['score'] += 1
-        with open('materias.json', 'w') as json_file:
-            json.dump(materias, json_file, indent=1)
-
         return '200'
+
     except:
         return '500'
 
