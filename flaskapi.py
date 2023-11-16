@@ -15,6 +15,11 @@ for materia in materias:
     materia['score'] = 0
 
 scoreTotal = 0
+def resetScore(k):
+    scoreTotal = 0
+    for materia in materias:
+        materia['score'] = max(0, materia['score'] - (100 - k))
+        scoreTotal += materia['score']
 
 def materiaPorID(id):
     for materia in materias:
@@ -46,8 +51,8 @@ def logger():
         for materia in data:
             materias[materia['id']]['score'] += 1
             scoreTotal += 1
-        if scoreTotal >= 100:
-            scoreTotal = 0
+        if scoreTotal > 100:
+            resetScore(25)
         
         data.insert(0, datetime.now())
         with open('analytics.csv', 'a') as csv_file:
