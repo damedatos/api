@@ -52,15 +52,16 @@ def logger():
     global scoreTotal
     try:
         data = json.loads(request.data)
-        for materia in data:
+        for materia in data['materias']:
             materias[materia['id']]['score'] += 1
             scoreTotal += 1
         if scoreTotal > 100:
             resetScore(25)
         
-        data.insert(0, datetime.now())
+        data['tiempo'] = datetime.now()
+        print(data)
         with open('analytics.csv', 'a') as csv_file:
-            writer = csv.writer(csv_file)
+            writer = csv.DictWriter(csv_file, data.keys())
             writer.writerow(data)
         return '200'
 
