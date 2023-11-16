@@ -14,6 +14,9 @@ with open('materias.json', 'r') as json_file:
 for materia in materias:
     materia['score'] = 0
 
+with open('autorizados.json', 'r') as json_file:
+    autorizados = json.load(json_file)
+
 scoreTotal = 0
 def resetScore(k):
     scoreTotal = 0
@@ -41,7 +44,8 @@ def buscar():
 def recomendar():
     data = request.get_json()
     recs = recomendador(data['materias'])
-    return materiasPorIDs(recs[:min(10, len(recs))])
+    if data['auth'] in autorizados:
+        return materiasPorIDs(recs[:min(10, len(recs))])
 
 @app.route('/api/log', methods=['POST'])
 def logger():
