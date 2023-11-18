@@ -51,7 +51,7 @@
     {"id": 49, "nombre": "Visión por computadora", "cht": 96, "tags": ["IA", "Visualizacion", "Algoritmos"], "dep": "DC"},
     {"id": 50, "nombre": "Seminario Avanzado de Teoría de Grafos", "cht": 96, "tags": ["Algoritmos", "Operativa"], "dep": "DC"},
     {"id": 51, "nombre": "Bases de Datos", "cht": 160, "tags": ["Algoritmos"], "dep": "DC"},
-    {"id": 52, "nombre": "Organización del Computador", "cht": 96, "tags": ["Algoritmos"], "dep": "DC"},
+    {"id": 52, "nombre": "Organización del Computador I", "cht": 96, "tags": ["Algoritmos"], "dep": "DC"},
     {"id": 53, "nombre": "Introducción a la dinámica de geo-fluidos", "cht": 80, "tags": ["Analisis", "Geo"], "dep": "DA"},
     {"id": 54, "nombre": "Introducción al modelado numérico de fluidos geofísicos", "cht": 80, "tags": ["Algebra", "Algoritmos", "Geo"], "dep": "DA"},
     {"id": 55, "nombre": "Introducción al sensoramiento remoto del sistema terrestre", "cht": 80, "tags": ["Geo", "Visualizacion"], "dep": "DA"},
@@ -69,5 +69,10 @@
     {"id": 67, "nombre": "Introducción al modelado de Sistemas Biológicos", "cht": 128, "tags": ["Biologia", "Analisis"]},
     {"id": 68, "nombre": "Introducción al modelado de Sistemas Sociales", "cht": 128, "tags": ["Analisis", "Estadistica"]},
     {"id": 69, "nombre": "Toma de decisiones", "cht": 112, "tags": ["Operativa", "Estadistica"]},
-    {"id": 70, "nombre": "Teoría de juegos", "cht": 64, "tags": ["Analisis", "Operativa"], "dep": "DC"}
+    {"id": 70, "nombre": "Teoría de juegos", "cht": 64, "tags": ["Analisis", "Operativa"], "dep": "DC"},
+    {"id": 71, "nombre": "Métodos de Elementos Finitos y Aplicaciones", "cht": 160, "tags": ["Algebra", "Operativa"], "dep": "DM"},
+    {"id": 72, "nombre": "Análisis Funcional", "cht": 160, "tags": ["Analisis"], "dep": "DM"},
+    {"id": 73, "nombre": "Ecuaciones Diferenciales", "cht": 160, "tags": ["Algebra", "Analisis"], "dep": "DM"},
+    {"id": 74, "nombre": "Sistemas Operativos", "cht": 160, "tags": ["Algoritmos"], "dep": "DC"},
+    {"id": 75, "nombre": "Ingenieria de Software", "cht": 160, "tags": ["Algoritmos"], "dep": "DC"}
 ]
