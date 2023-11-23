@@ -21,11 +21,13 @@ col_analytics = client.damedatos.analytics
 with open('autorizados.json', 'r') as json_file:
     autorizados = json.load(json_file)
 
+scoreMax = 1000
+
 def resetScore(k):
-    col_materias.update_many({}, {'$set': {'score': {'$max': [0, {'$subtract': ['$score', 100-k]}]}}})
+    col_materias.update_many({}, {'$set': {'score': 0}})
     suma = col_materias.aggregate([{'$group': {'_id': None, 'suma': {'$sum': '$score'}}}])
-    suma = suma.next()['suma'].next()
-    col_score.update_one({'_id': 'scoreTotal'}, {'score': suma})
+    suma = suma.next()['suma']
+    col_score.update_one({'_id': 'scoreTotal'}, {'$set': {'score': suma}})
 
 def materiasPorIDs(ids):
     return list(col_materias.find({'_id': {'$in': ids}}))
@@ -35,7 +37,6 @@ def buscar():
     busqueda = request.args.get('q', '').lower()
     pattern = f".*{busqueda}.*"
     results = list(col_materias.find({'nombre': {'$regex': Regex(pattern, 'i')}}))
-    print(results)
     return results
 
 @app.route('/api/materias/recomendar', methods=['POST'])
@@ -53,7 +54,8 @@ def logger():
         for materia in data['materias']:
             col_materias.update_one({'_id': materia['_id']}, {'$inc': {'score': 1}})
             col_score.update_one({'_id': 'scoreTotal'}, {'$inc': {'score': 1}})
-        if col_score.find_one({'_id': 'scoreTotal'})['score'] > 100:
+        print(col_score.find_one({'_id': 'scoreTotal'})['score'])
+        if col_score.find_one({'_id': 'scoreTotal'})['score'] > scoreMax:
             resetScore(25)
         
         data['tiempo'] = datetime.now()
