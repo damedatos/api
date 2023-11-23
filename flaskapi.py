@@ -1,6 +1,11 @@
 from modelo import recomendador
+
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import Flask, request
+
+from pymongo import MongoClient
+from bson.regex import Regex
+
 from datetime import datetime
 import json, csv
 
@@ -8,36 +13,29 @@ app = Flask(__name__)
 app.wsgi_app = ProxyFix(
     app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
 )
-
-with open('materias.json', 'r') as json_file:
-    materias = json.load(json_file)
-for materia in materias:
-    materia['score'] = 0
+client = MongoClient('localhost', 27017)
+col_materias = client.damedatos.materias
+col_score = client.damedatos.score
+col_analytics = client.damedatos.analytics
 
 with open('autorizados.json', 'r') as json_file:
     autorizados = json.load(json_file)
 
-scoreTotal = 0
 def resetScore(k):
-    scoreTotal = 0
-    for materia in materias:
-        materia['score'] = max(0, materia['score'] - (100 - k))
-        scoreTotal += materia['score']
-
-def materiaPorID(id):
-    for materia in materias:
-        if materia['id'] == id:
-            return materia
-    return None
+    col_materias.update_many({}, {'$set': {'score': {'$max': [0, {'$subtract': ['$score', 100-k]}]}}})
+    suma = col_materias.aggregate([{'$group': {'_id': None, 'suma': {'$sum': '$score'}}}])
+    suma = suma.next()['suma'].next()
+    col_score.update_one({'_id': 'scoreTotal'}, {'score': suma})
 
 def materiasPorIDs(ids):
-    results = [materiaPorID(id) for id in ids]
-    return results
+    return list(col_materias.find({'_id': {'$in': ids}}))
 
 @app.route('/api/materias/buscar', methods=['GET'])
 def buscar():
     busqueda = request.args.get('q', '').lower()
-    results = [materia for materia in materias if busqueda in materia['nombre'].lower()]
+    pattern = f".*{busqueda}.*"
+    results = list(col_materias.find({'nombre': {'$regex': Regex(pattern, 'i')}}))
+    print(results)
     return results
 
 @app.route('/api/materias/recomendar', methods=['POST'])
@@ -46,23 +44,20 @@ def recomendar():
     recs = recomendador(data['materias'])
     if data['auth'] in autorizados:
         return materiasPorIDs(recs[:min(10, len(recs))])
+    return []
 
 @app.route('/api/log', methods=['POST'])
 def logger():
-    global scoreTotal
     try:
         data = json.loads(request.data)
         for materia in data['materias']:
-            materias[materia['id']]['score'] += 1
-            scoreTotal += 1
-        if scoreTotal > 100:
+            col_materias.update_one({'_id': materia['_id']}, {'$inc': {'score': 1}})
+            col_score.update_one({'_id': 'scoreTotal'}, {'$inc': {'score': 1}})
+        if col_score.find_one({'_id': 'scoreTotal'})['score'] > 100:
             resetScore(25)
         
         data['tiempo'] = datetime.now()
-        print(data)
-        with open('analytics.csv', 'a') as csv_file:
-            writer = csv.DictWriter(csv_file, data.keys())
-            writer.writerow(data)
+        col_analytics.insert_one(data)
         return '200'
 
     except:
