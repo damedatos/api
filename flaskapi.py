@@ -43,9 +43,7 @@ def buscar():
 def recomendar():
     data = request.get_json()
     recs = recomendador(data['materias'])
-    if data['auth'] in autorizados:
-        return materiasPorIDs(recs[:min(10, len(recs))])
-    return []
+    return materiasPorIDs(recs[:min(10, len(recs))])
 
 @app.route('/api/log', methods=['POST'])
 def logger():
@@ -54,7 +52,6 @@ def logger():
         for materia in data['materias']:
             col_materias.update_one({'_id': materia['_id']}, {'$inc': {'score': 1}})
             col_score.update_one({'_id': 'scoreTotal'}, {'$inc': {'score': 1}})
-        print(col_score.find_one({'_id': 'scoreTotal'})['score'])
         if col_score.find_one({'_id': 'scoreTotal'})['score'] > scoreMax:
             resetScore(25)
         
